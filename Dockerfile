@@ -42,8 +42,8 @@ RUN composer install --no-dev --optimize-autoloader
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Copiar .env.example para .env se não existir
-RUN if [ ! -f .env ]; then cp .env.example .env; fi
+# Copiar env.example para .env se não existir
+RUN if [ ! -f .env ]; then cp env.example .env; fi
 
 # Gerar chave da aplicação
 RUN php artisan key:generate
