@@ -134,10 +134,10 @@ return [
     */
 
     'usermenu_enabled' => true,
-    'usermenu_header' => false,
-    'usermenu_header_class' => 'bg-primary',
+    'usermenu_header' => true,
+    'usermenu_header_class' => 'bg-success',
     'usermenu_image' => false,
-    'usermenu_desc' => false,
+    'usermenu_desc' => 'Administrador',
     'usermenu_profile_url' => false,
 
     /*
@@ -340,6 +340,13 @@ return [
             'text' => 'Relatórios',
             'url'  => 'admin/relatorios',
             'icon' => 'fas fa-chart-line',
+        ],
+        ['header' => 'SISTEMA'],
+        [
+            'text' => 'Sair',
+            'url'  => 'logout',
+            'icon' => 'fas fa-sign-out-alt',
+            'icon_color' => 'red',
         ],
     ],
 
