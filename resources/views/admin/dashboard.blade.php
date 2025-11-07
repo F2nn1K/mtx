@@ -171,12 +171,3 @@
         </div>
     </div>
 @stop
-
-@section('css')
-<link rel="stylesheet" href="{{ asset('css/admin-custom.css') }}">
-@stop
-
-@section('js')
-<script src="{{ asset('js/admin-clean.js') }}"></script>
-@stop
-
