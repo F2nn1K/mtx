@@ -114,7 +114,7 @@
                             <tr>
                                 <td><strong>{{ $corrida->nome }}</strong></td>
                                 <td>{{ $corrida->local }}</td>
-                                <td>{{ $corrida->data_hora->format('d/m/Y H:i') }}</td>
+                                <td>{{ optional($corrida->data_hora)->format('d/m/Y H:i') ?? '-' }}</td>
                                 <td>{{ $corrida->apostas()->count() }} apostas</td>
                                 <td>
                                     <a href="{{ route('admin.corridas.edit', $corrida->id) }}" class="btn btn-sm btn-primary">
@@ -154,10 +154,10 @@
                             <tr>
                                 <td>{{ $corrida->nome }}</td>
                                 <td>{{ $corrida->local }}</td>
-                                <td>{{ $corrida->data_hora->format('d/m/Y H:i') }}</td>
+                                <td>{{ optional($corrida->data_hora)->format('d/m/Y H:i') ?? '-' }}</td>
                                 <td>{{ $corrida->pilotos()->count() }} pilotos</td>
                                 <td>
-                                    <span class="badge badge-success">{{ ucfirst($corrida->status) }}</span>
+                                    <span class="badge badge-success">{{ $corrida->status ? ucfirst($corrida->status) : '-' }}</span>
                                 </td>
                             </tr>
                             @endforeach
