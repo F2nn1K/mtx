@@ -1,13 +1,14 @@
 # Usar imagem PHP 8.2 com Apache
 FROM php:8.2-apache
 
-# Instalar dependências do sistema
+# Instalar dependências do sistema (incluindo PostgreSQL)
 RUN apt-get update && apt-get install -y \
     git \
     curl \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
+    libpq-dev \
     zip \
     unzip \
     libzip-dev
@@ -16,7 +17,6 @@ RUN apt-get update && apt-get install -y \
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Instalar extensões PHP (MySQL e PostgreSQL)
-RUN apt-get install -y libpq-dev
 RUN docker-php-ext-install pdo_mysql pdo_pgsql pgsql mbstring exif pcntl bcmath gd zip
 
 # Copiar Composer do composer oficial
