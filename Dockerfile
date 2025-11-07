@@ -39,6 +39,10 @@ COPY . /var/www/html
 # Instalar dependências do Composer
 RUN composer install --no-dev --optimize-autoloader
 
+# Criar diretórios necessários do Laravel
+RUN mkdir -p storage/framework/{sessions,views,cache}
+RUN mkdir -p storage/logs
+
 # Configurar permissões
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
@@ -49,9 +53,11 @@ RUN if [ ! -f .env ]; then cp env.example .env; fi
 # Gerar chave da aplicação (sem interação)
 RUN php artisan key:generate --force --no-interaction || echo "Chave já existe"
 
-# Limpar cache para evitar erros
+# Limpar cache e otimizar
 RUN php artisan config:clear || true
 RUN php artisan cache:clear || true
+RUN php artisan view:clear || true
+RUN php artisan route:clear || true
 
 # Expor porta 80
 EXPOSE 80
