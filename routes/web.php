@@ -21,6 +21,32 @@ Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// Rota de diagnóstico (TEMPORÁRIA - remover depois)
+Route::get('/admin/diagnostico', function() {
+    try {
+        $user = Auth::user();
+        $usuariosCount = \App\Models\User::count();
+        $corridasCount = \App\Models\Corrida::count();
+        
+        return response()->json([
+            'status' => 'OK',
+            'usuario_logado' => $user ? $user->email : 'nenhum',
+            'banco_conectado' => true,
+            'total_usuarios' => $usuariosCount,
+            'total_corridas' => $corridasCount,
+            'adminlte_instalado' => file_exists(public_path('vendor/adminlte')),
+            'view_existe' => view()->exists('admin.dashboard'),
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'ERRO',
+            'mensagem' => $e->getMessage(),
+            'arquivo' => $e->getFile(),
+            'linha' => $e->getLine(),
+        ], 500);
+    }
+})->middleware('auth');
+
 // Rotas Admin (protegidas)
 Route::prefix('admin')->middleware('auth')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('admin.dashboard');
