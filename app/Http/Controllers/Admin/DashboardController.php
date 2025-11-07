@@ -13,19 +13,49 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $totalUsuarios = User::where('is_admin', false)->count();
-        $totalCorridas = Corrida::count();
-        $totalApostas = Aposta::count();
-        $totalApostasHoje = Aposta::whereDate('created_at', today())->count();
-        
-        $valorTotalApostas = Aposta::sum('valor') ?? 0;
-        $valorApostasHoje = Aposta::whereDate('created_at', today())->sum('valor') ?? 0;
-        
-        $depositosPendentes = Transacao::where('tipo', 'deposito')->where('status', 'pendente')->count();
-        $saquesPendentes = Transacao::where('tipo', 'saque')->where('status', 'pendente')->count();
-        
-        $corridasAoVivo = Corrida::where('status', 'ao_vivo')->get();
-        $proximasCorridas = Corrida::where('status', 'aberta')->orderBy('data_hora', 'asc')->limit(5)->get();
+        try {
+            $totalUsuarios = User::where('is_admin', false)->count();
+        } catch (\Exception $e) {
+            $totalUsuarios = 0;
+        }
+
+        try {
+            $totalCorridas = Corrida::count();
+        } catch (\Exception $e) {
+            $totalCorridas = 0;
+        }
+
+        try {
+            $totalApostas = Aposta::count();
+            $totalApostasHoje = Aposta::whereDate('created_at', today())->count();
+            $valorTotalApostas = Aposta::sum('valor') ?? 0;
+            $valorApostasHoje = Aposta::whereDate('created_at', today())->sum('valor') ?? 0;
+        } catch (\Exception $e) {
+            $totalApostas = 0;
+            $totalApostasHoje = 0;
+            $valorTotalApostas = 0;
+            $valorApostasHoje = 0;
+        }
+
+        try {
+            $depositosPendentes = Transacao::where('tipo', 'deposito')->where('status', 'pendente')->count();
+            $saquesPendentes = Transacao::where('tipo', 'saque')->where('status', 'pendente')->count();
+        } catch (\Exception $e) {
+            $depositosPendentes = 0;
+            $saquesPendentes = 0;
+        }
+
+        try {
+            $corridasAoVivo = Corrida::where('status', 'ao_vivo')->get();
+        } catch (\Exception $e) {
+            $corridasAoVivo = collect();
+        }
+
+        try {
+            $proximasCorridas = Corrida::where('status', 'aberta')->orderBy('data_hora', 'asc')->limit(5)->get();
+        } catch (\Exception $e) {
+            $proximasCorridas = collect();
+        }
         
         return view('admin.dashboard', compact(
             'totalUsuarios', 'totalCorridas', 'totalApostas', 'totalApostasHoje',
