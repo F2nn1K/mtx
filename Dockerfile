@@ -46,8 +46,12 @@ RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 # Copiar env.example para .env se não existir
 RUN if [ ! -f .env ]; then cp env.example .env; fi
 
-# Gerar chave da aplicação
-RUN php artisan key:generate
+# Gerar chave da aplicação (sem interação)
+RUN php artisan key:generate --force --no-interaction || echo "Chave já existe"
+
+# Limpar cache para evitar erros
+RUN php artisan config:clear || true
+RUN php artisan cache:clear || true
 
 # Expor porta 80
 EXPOSE 80
