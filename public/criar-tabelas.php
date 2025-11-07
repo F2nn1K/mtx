@@ -135,22 +135,42 @@ if (isset($_GET['executar'])) {
         
         // Inserir admin
         $passwordHash = '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi';
-        $pdo->exec("INSERT INTO users (nome, email, cpf, telefone, data_nascimento, password, is_admin, ativo) 
-                    VALUES ('Admin', 'admin@apostas.com', '00000000000', '11999999999', '1990-01-01', '$passwordHash', TRUE, TRUE)
+        $pdo->exec("INSERT INTO users (nome, email, cpf, telefone, data_nascimento, password, saldo, is_admin, ativo) 
+                    VALUES ('Admin', 'admin@apostas.com', '00000000000', '11999999999', '1990-01-01', '$passwordHash', 5000.00, TRUE, TRUE)
                     ON CONFLICT (email) DO NOTHING");
-        echo "\n✅ Admin criado!\n";
+        echo "\n✅ Admin criado (admin@apostas.com / password)!\n";
+        
+        // Inserir usuário teste
+        $pdo->exec("INSERT INTO users (nome, email, cpf, telefone, data_nascimento, password, saldo, is_admin, ativo) 
+                    VALUES ('Usuário Teste', 'usuario@teste.com', '12345678901', '95999887766', '1995-05-15', '$passwordHash', 1500.00, FALSE, TRUE)
+                    ON CONFLICT (email) DO NOTHING");
+        echo "✅ Usuário teste criado (usuario@teste.com / password) com R$ 1.500!\n";
         
         // Inserir pilotos
         $pilotos = [
             ['João Silva', 15, 'MX1'],
             ['Pedro Santos', 7, 'MX1'],
             ['Carlos Oliveira', 22, 'MX1'],
+            ['Rafael Lima', 33, 'MX2'],
+            ['Lucas Costa', 8, 'MX2'],
+            ['Marcos Souza', 11, 'MX2'],
+            ['Fernando Alves', 99, 'MX3'],
+            ['Gustavo Pereira', 44, 'MX3'],
         ];
         
         foreach ($pilotos as $p) {
             $pdo->exec("INSERT INTO pilotos (nome, numero, categoria) VALUES ('$p[0]', $p[1], '$p[2]') ON CONFLICT (numero) DO NOTHING");
         }
-        echo "✅ Pilotos criados!\n";
+        echo "✅ 8 Pilotos criados!\n";
+        
+        // Inserir corrida de exemplo
+        $pdo->exec("INSERT INTO corridas (nome, local, data_hora, categoria, descricao, status) 
+                    VALUES ('Campeonato Brasileiro de Motocross 2025', 'São Paulo - SP', '2025-12-15 14:00:00', 'MX1', 'Primeira etapa', 'aberta')");
+        $corridaId = $pdo->lastInsertId();
+        
+        // Vincular pilotos à corrida
+        $pdo->exec("INSERT INTO corrida_piloto (corrida_id, piloto_id, cotacao) VALUES ($corridaId, 1, 3.50), ($corridaId, 2, 2.80), ($corridaId, 3, 5.00)");
+        echo "✅ Corrida de exemplo criada!\n";
         
         echo "</pre>";
         echo "<hr><h2 style='color:green;'>✅ TUDO CRIADO COM SUCESSO!</h2>";
