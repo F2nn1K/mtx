@@ -53,6 +53,9 @@ RUN if [ ! -f .env ]; then cp env.example .env; fi
 # Gerar chave da aplicação (sem interação)
 RUN php artisan key:generate --force --no-interaction || echo "Chave já existe"
 
+# Instalar AdminLTE assets
+RUN php artisan adminlte:install --only=assets --force --no-interaction || true
+
 # Limpar cache e otimizar
 RUN php artisan config:clear || true
 RUN php artisan cache:clear || true
