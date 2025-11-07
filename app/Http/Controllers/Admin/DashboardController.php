@@ -57,7 +57,7 @@ class DashboardController extends Controller
             $proximasCorridas = collect();
         }
         
-        return view('admin.dashboard-temp', compact(
+        return view('admin.dashboard', compact(
             'totalUsuarios', 'totalCorridas', 'totalApostas', 'totalApostasHoje',
             'valorTotalApostas', 'valorApostasHoje', 'depositosPendentes', 'saquesPendentes',
             'corridasAoVivo', 'proximasCorridas'
