@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minhas Apostas - Apostas Motocross</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #0d2818;">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <img src="img/logo.png" alt="Roraima Bets" height="40" style="margin-right: 10px;">
+                <strong style="color: #d4af37;">RORAIMA BETS</strong>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto"></ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <h1><i class="fas fa-ticket-alt"></i> Minhas Apostas</h1>
+                <p class="text-muted">Acompanhe todas as suas apostas</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <button class="btn btn-primary" onclick="carregarApostas()">
+                    <i class="fas fa-sync"></i> Atualizar
+                </button>
+            </div>
+        </div>
+
+        <div id="alertas"></div>
+
+        <!-- Estatísticas -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h6 class="text-muted">Total de Apostas</h6>
+                        <h3 id="totalApostas">0</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h6 class="text-muted">Apostas Ativas</h6>
+                        <h3 class="text-warning" id="totalAtivas">0</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h6 class="text-muted">Vitórias</h6>
+                        <h3 class="text-success" id="totalVitorias">0</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h6 class="text-muted">Total Ganho</h6>
+                        <h3 class="text-success" id="totalGanho">R$ 0,00</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtro -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <select class="form-select" id="filtroStatus" onchange="filtrarApostas()">
+                            <option value="">Todos os Status</option>
+                            <option value="ativa">Ativas</option>
+                            <option value="venceu">Vencidas</option>
+                            <option value="perdeu">Perdidas</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de Apostas -->
+        <div id="listaApostas">
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script>
+        verificarAuth(true);
+
+        let todasApostas = [];
+
+        async function carregarApostas() {
+            const container = document.getElementById('listaApostas');
+            container.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div></div>';
+
+            try {
+                todasApostas = await api.getMinhasApostas();
+                
+                // Calcular estatísticas
+                const stats = {
+                    total: todasApostas.length,
+                    ativas: todasApostas.filter(a => a.status === 'ativa').length,
+                    vitorias: todasApostas.filter(a => a.status === 'venceu').length,
+                    totalGanho: todasApostas.filter(a => a.status === 'venceu')
+                        .reduce((sum, a) => sum + parseFloat(a.valor_ganho || 0), 0)
+                };
+
+                document.getElementById('totalApostas').textContent = stats.total;
+                document.getElementById('totalAtivas').textContent = stats.ativas;
+                document.getElementById('totalVitorias').textContent = stats.vitorias;
+                document.getElementById('totalGanho').textContent = formatarMoeda(stats.totalGanho);
+
+                filtrarApostas();
+            } catch (error) {
+                container.innerHTML = '<div class="alert alert-danger">Erro ao carregar apostas</div>';
+                console.error(error);
+            }
+        }
+
+        function filtrarApostas() {
+            const filtro = document.getElementById('filtroStatus').value;
+            const apostas = filtro ? todasApostas.filter(a => a.status === filtro) : todasApostas;
+            
+            const container = document.getElementById('listaApostas');
+
+            if (apostas.length === 0) {
+                container.innerHTML = '<div class="alert alert-info">Nenhuma aposta encontrada</div>';
+                return;
+            }
+
+            container.innerHTML = apostas.map(aposta => {
+                const statusClass = aposta.status === 'ativa' ? 'warning' : 
+                                  aposta.status === 'venceu' ? 'success' : 'danger';
+                const statusIcon = aposta.status === 'ativa' ? 'fa-hourglass-half' : 
+                                 aposta.status === 'venceu' ? 'fa-trophy' : 'fa-times-circle';
+
+                return `
+                    <div class="card mb-3">
+                        <div class="card-header bg-${statusClass} text-white">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <i class="fas ${statusIcon}"></i>
+                                    <strong>${aposta.corrida.nome}</strong>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <span class="badge bg-light text-dark">
+                                        ${aposta.status === 'ativa' ? 'Ativa' : 
+                                          aposta.status === 'venceu' ? 'Venceu' : 'Perdeu'}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p class="mb-2">
+                                        <i class="fas fa-motorcycle"></i> 
+                                        <strong>Piloto:</strong> #${aposta.piloto.numero} ${aposta.piloto.nome}
+                                    </p>
+                                    <p class="mb-2">
+                                        <i class="fas fa-ticket-alt"></i> 
+                                        <strong>Tipo:</strong> ${aposta.tipo_aposta_label}
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-2">
+                                        <i class="fas fa-money-bill"></i> 
+                                        <strong>Valor:</strong> ${formatarMoeda(aposta.valor)}
+                                    </p>
+                                    <p class="mb-2">
+                                        <i class="fas fa-chart-line"></i> 
+                                        <strong>Cotação:</strong> ${aposta.cotacao}x
+                                    </p>
+                                    ${aposta.status === 'venceu' ? `
+                                        <p class="mb-2 text-success">
+                                            <i class="fas fa-trophy"></i> 
+                                            <strong>Ganho:</strong> ${formatarMoeda(aposta.valor_ganho)}
+                                        </p>
+                                    ` : aposta.status === 'ativa' ? `
+                                        <p class="mb-2 text-warning">
+                                            <i class="fas fa-hourglass-half"></i> 
+                                            <strong>Possível:</strong> ${formatarMoeda(aposta.valor_possivel)}
+                                        </p>
+                                    ` : ''}
+                                </div>
+                            </div>
+                            <small class="text-muted">
+                                <i class="far fa-calendar"></i> ${formatarData(aposta.created_at)}
+                            </small>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        carregarApostas();
+        
+        // Auto-refresh a cada 30 segundos
+        setInterval(carregarApostas, 30000);
+    </script>
+</body>
+</html>
+

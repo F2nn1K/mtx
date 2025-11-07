@@ -1,0 +1,244 @@
+/* ===================================
+   CUSTOMIZAÇÃO ADMIN - RORAIMA BETS
+   Paleta: Verde Escuro + Dourado
+=================================== */
+
+/* SIDEBAR - Fundo verde escuro */
+.sidebar-dark-success {
+    background: linear-gradient(180deg, #0d2818 0%, #0f2a1a 50%, #0d2818 100%) !important;
+}
+
+/* Logo e Brand */
+.brand-link {
+    background: #0a1f14 !important;
+    border-bottom: 2px solid #d4af37 !important;
+    padding: 15px !important;
+}
+
+.brand-link:hover {
+    background: #0d2818 !important;
+}
+
+.brand-text {
+    color: #d4af37 !important;
+    font-weight: 900 !important;
+    font-size: 1.2rem !important;
+}
+
+.brand-image {
+    opacity: 1 !important;
+    filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.5)) !important;
+}
+
+/* Links do menu - Dourado */
+.sidebar-dark-success .nav-link {
+    color: #d4af37 !important;
+    font-weight: 600 !important;
+    transition: all 0.3s !important;
+}
+
+.sidebar-dark-success .nav-link:hover {
+    background: rgba(212, 175, 55, 0.15) !important;
+    color: #f4d03f !important;
+    padding-left: 1.2rem !important;
+}
+
+/* Link ativo - Dourado sólido */
+.sidebar-dark-success .nav-sidebar > .nav-item > .nav-link.active {
+    background: linear-gradient(90deg, #d4af37 0%, #f4d03f 100%) !important;
+    color: #0d2818 !important;
+    font-weight: 800 !important;
+    box-shadow: 0 3px 10px rgba(212, 175, 55, 0.3) !important;
+}
+
+/* Ícones do menu */
+.sidebar-dark-success .nav-link i {
+    color: #d4af37 !important;
+}
+
+.sidebar-dark-success .nav-link.active i {
+    color: #0d2818 !important;
+}
+
+/* Headers do menu */
+.sidebar-dark-success .nav-header {
+    color: #f4d03f !important;
+    background: rgba(212, 175, 55, 0.1) !important;
+    font-weight: 800 !important;
+    letter-spacing: 1px !important;
+    padding: 10px 15px !important;
+    margin: 10px 0 !important;
+    border-left: 4px solid #d4af37 !important;
+}
+
+/* Main Header - Navbar superior */
+.main-header {
+    background: linear-gradient(90deg, #0a1f14 0%, #0d2818 100%) !important;
+    border-bottom: 3px solid #d4af37 !important;
+}
+
+.main-header .navbar-nav .nav-link {
+    color: #d4af37 !important;
+}
+
+/* Content Header */
+.content-header {
+    background: linear-gradient(135deg, #0d2818 0%, #1a4d3a 100%);
+    color: white;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-left: 5px solid #d4af37;
+}
+
+.content-header h1 {
+    color: #d4af37 !important;
+    font-weight: 800;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* Botões - Dourado */
+.btn-success,
+.btn-primary {
+    background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%) !important;
+    border: none !important;
+    color: #0d2818 !important;
+    font-weight: 700 !important;
+}
+
+.btn-success:hover,
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4) !important;
+    background: linear-gradient(135deg, #f4d03f 0%, #d4af37 100%) !important;
+}
+
+/* Cards - Verde escuro com borda dourada */
+.card {
+    border: 1px solid #d4af37 !important;
+    box-shadow: 0 2px 10px rgba(212, 175, 55, 0.1) !important;
+}
+
+.card-header {
+    background: linear-gradient(135deg, #0d2818 0%, #1a4d3a 100%) !important;
+    color: #d4af37 !important;
+    border-bottom: 3px solid #d4af37 !important;
+}
+
+.card-title {
+    color: #d4af37 !important;
+    font-weight: 800 !important;
+    font-size: 1.1rem !important;
+}
+
+.card-tools .btn {
+    color: #d4af37 !important;
+    border-color: #d4af37 !important;
+}
+
+.card-tools .btn:hover {
+    background: #d4af37 !important;
+    color: #0d2818 !important;
+}
+
+/* Links */
+a {
+    color: #d4af37 !important;
+}
+
+a:hover {
+    color: #f4d03f !important;
+}
+
+/* Alertas customizados */
+.alert-warning {
+    background: rgba(212, 175, 55, 0.1) !important;
+    border-left: 4px solid #d4af37 !important;
+    color: #333 !important;
+}
+
+.alert-warning h5 {
+    color: #d4af37 !important;
+}
+
+/* Badges */
+.badge-success {
+    background: #4caf50 !important;
+}
+
+.badge-danger {
+    background: #f44336 !important;
+}
+
+.badge-warning {
+    background: #d4af37 !important;
+    color: #0d2818 !important;
+}
+
+/* Tabelas */
+.table-hover tbody tr:hover {
+    background: rgba(212, 175, 55, 0.05) !important;
+}
+
+/* Small boxes - Cards do dashboard */
+.small-box {
+    border-radius: 8px !important;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.2) !important;
+}
+
+.small-box.bg-success,
+.small-box[style*="background"] {
+    color: white !important;
+}
+
+.small-box h3 {
+    font-weight: 900 !important;
+    font-size: 2.5rem !important;
+}
+
+.small-box p {
+    font-weight: 600 !important;
+}
+
+.small-box .icon {
+    color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.small-box-footer {
+    background: rgba(0, 0, 0, 0.2) !important;
+    color: #d4af37 !important;
+    font-weight: 600 !important;
+}
+
+.small-box-footer:hover {
+    background: rgba(0, 0, 0, 0.3) !important;
+    color: #f4d03f !important;
+}
+
+/* ===================================
+   ESCONDER ITENS PADRÃO DO ADMINLTE
+=================================== */
+/* Esconder menu padrão que vem do AdminLTE */
+.sidebar-mini .main-sidebar .nav-link[href*="pages"],
+.sidebar-mini .main-sidebar .nav-link[href*="profile"],
+.sidebar-mini .main-sidebar .nav-link[href*="password"],
+.sidebar-mini .main-sidebar .nav-link[href*="multilevel"],
+.sidebar-mini .main-sidebar .nav-header:contains("ACCOUNT"),
+.sidebar-mini .main-sidebar .nav-header:contains("LABELS"),
+.nav-item:has(.nav-link[href*="pages"]),
+.nav-item:has(.nav-link[href*="profile"]),
+.nav-item:has(.nav-link[href*="password"]),
+li.nav-header {
+    display: none !important;
+}
+
+/* Mostrar apenas headers que queremos */
+.nav-header:contains("GERENCIAMENTO"),
+.nav-header:contains("FINANCEIRO") {
+    display: block !important;
+}
+
+/* Forçar menu limpo */
+.sidebar .nav > li:not(.nav-header):not(:has([href*="admin/"])) {
+    display: none !important;
+}
+

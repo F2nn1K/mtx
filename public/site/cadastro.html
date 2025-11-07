@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro - Apostas Motocross</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card auth-card shadow-lg">
+                        <div class="card-body p-5">
+                            <div class="text-center mb-4">
+                                <img src="img/logo.png" alt="Roraima Bets" style="max-width: 150px; margin-bottom: 20px;">
+                                <h2 style="color: #1a4d3a;">RORAIMA BETS</h2>
+                                <p class="text-muted">Criar sua conta</p>
+                            </div>
+
+                            <div id="alertas"></div>
+
+                            <form id="formCadastro">
+                                <div class="mb-3">
+                                    <label for="nome" class="form-label">Nome Completo</label>
+                                    <input type="text" class="form-control" id="nome" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">E-mail</label>
+                                    <input type="email" class="form-control" id="email" required>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="cpf" class="form-label">CPF (sem pontos)</label>
+                                        <input type="text" class="form-control" id="cpf" maxlength="11" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="telefone" class="form-label">Telefone</label>
+                                        <input type="tel" class="form-control" id="telefone" required>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="data_nascimento" class="form-label">Data de Nascimento</label>
+                                    <input type="date" class="form-control" id="data_nascimento" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">Senha</label>
+                                    <input type="password" class="form-control" id="password" minlength="6" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="password_confirmation" class="form-label">Confirmar Senha</label>
+                                    <input type="password" class="form-control" id="password_confirmation" required>
+                                </div>
+
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="termos" required>
+                                    <label class="form-check-label small" for="termos">
+                                        Declaro que tenho mais de 18 anos e aceito os termos de uso
+                                    </label>
+                                </div>
+
+                                <button type="submit" class="btn btn-success w-100 btn-lg" id="btnCadastrar">
+                                    <i class="fas fa-user-plus"></i> Cadastrar
+                                </button>
+                            </form>
+
+                            <div class="text-center mt-3">
+                                <p class="text-muted">Já tem uma conta? 
+                                    <a href="login.html">Fazer login</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script>
+        verificarAuth(false);
+
+        document.getElementById('formCadastro').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const btnCadastrar = document.getElementById('btnCadastrar');
+            btnCadastrar.disabled = true;
+            btnCadastrar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cadastrando...';
+
+            const dados = {
+                nome: document.getElementById('nome').value,
+                email: document.getElementById('email').value,
+                cpf: document.getElementById('cpf').value,
+                telefone: document.getElementById('telefone').value,
+                data_nascimento: document.getElementById('data_nascimento').value,
+                password: document.getElementById('password').value,
+                password_confirmation: document.getElementById('password_confirmation').value,
+            };
+
+            // Validar senha
+            if (dados.password !== dados.password_confirmation) {
+                mostrarAlerta('As senhas não conferem!', 'danger');
+                btnCadastrar.disabled = false;
+                btnCadastrar.innerHTML = '<i class="fas fa-user-plus"></i> Cadastrar';
+                return;
+            }
+
+            // Validar idade
+            const idade = new Date().getFullYear() - new Date(dados.data_nascimento).getFullYear();
+            if (idade < 18) {
+                mostrarAlerta('Você precisa ter 18 anos ou mais!', 'danger');
+                btnCadastrar.disabled = false;
+                btnCadastrar.innerHTML = '<i class="fas fa-user-plus"></i> Cadastrar';
+                return;
+            }
+
+            try {
+                const response = await api.register(dados);
+                
+                if (response.success) {
+                    mostrarAlerta('Cadastro realizado com sucesso! Redirecionando...', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'corridas.html';
+                    }, 1500);
+                } else {
+                    mostrarAlerta(response.message || 'Erro ao cadastrar', 'danger');
+                    btnCadastrar.disabled = false;
+                    btnCadastrar.innerHTML = '<i class="fas fa-user-plus"></i> Cadastrar';
+                }
+            } catch (error) {
+                mostrarAlerta('Erro ao cadastrar. Verifique os dados e tente novamente.', 'danger');
+                btnCadastrar.disabled = false;
+                btnCadastrar.innerHTML = '<i class="fas fa-user-plus"></i> Cadastrar';
+            }
+        });
+    </script>
+</body>
+</html>
+

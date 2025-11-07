@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corridas - Roraima Bets</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/corridas.css">
+</head>
+<body class="body-dark">
+    <!-- Navbar Profissional -->
+    <nav class="navbar-pro">
+        <div class="container-fluid">
+            <div class="navbar-content">
+                <a class="logo-link" href="index.html">
+                    <img src="img/logo.png" alt="Roraima Bets" height="45">
+                    <span class="logo-text">RORAIMA BETS</span>
+                </a>
+                
+                <div class="nav-links" id="navLinks">
+                    <!-- Será preenchido pelo JavaScript -->
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Layout Profissional -->
+    <div class="main-layout">
+        <!-- Sidebar Esquerda - Filtros -->
+        <aside class="sidebar-left">
+            <div class="sidebar-header">
+                <i class="fas fa-filter"></i> FILTROS
+            </div>
+            <div class="filter-group">
+                <label>Status</label>
+                <select class="form-control-dark" id="filtroStatus" onchange="carregarCorridas()">
+                    <option value="">Todas</option>
+                    <option value="aberta" selected>Abertas</option>
+                    <option value="ao_vivo">Ao Vivo</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Categoria</label>
+                <select class="form-control-dark" id="filtroCategoria" onchange="carregarCorridas()">
+                    <option value="">Todas</option>
+                    <option value="MX1">MX1</option>
+                    <option value="MX2">MX2</option>
+                    <option value="MX3">MX3</option>
+                </select>
+            </div>
+            <button class="btn-refresh" onclick="carregarCorridas()">
+                <i class="fas fa-sync"></i> Atualizar
+            </button>
+        </aside>
+
+        <!-- Conteúdo Principal -->
+        <main class="content-main">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title"><i class="fas fa-flag-checkered"></i> Corridas de Motocross</h1>
+                    <p class="page-subtitle">Escolha sua corrida e faça suas apostas</p>
+                </div>
+            </div>
+
+            <div id="alertas"></div>
+
+            <!-- Lista de Corridas -->
+            <div id="listaCorridas" class="corridas-container">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-gold">
+                        <span class="visually-hidden">Carregando...</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Sidebar Direita - Saldo e Info -->
+        <aside class="sidebar-right">
+            <div id="saldoContainer" class="saldo-widget"></div>
+            
+            <div class="info-widget">
+                <div class="info-widget-header">
+                    <i class="fas fa-trophy"></i> Maiores Prêmios
+                </div>
+                <div class="info-widget-body">
+                    <div class="premio-item">
+                        <span class="premio-nome">João Silva</span>
+                        <span class="premio-valor">R$ 12.500</span>
+                    </div>
+                    <div class="premio-item">
+                        <span class="premio-nome">Maria Costa</span>
+                        <span class="premio-valor">R$ 8.750</span>
+                    </div>
+                    <div class="premio-item">
+                        <span class="premio-nome">Pedro Alves</span>
+                        <span class="premio-valor">R$ 6.200</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-widget">
+                <div class="info-widget-header">
+                    <i class="fas fa-fire"></i> Corridas Populares
+                </div>
+                <div class="info-widget-body">
+                    <div class="hot-race">
+                        <i class="fas fa-circle text-danger"></i>
+                        <span>Brasileiro MX1</span>
+                        <span class="badge-hot">247 apostas</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Modal de Aposta Profissional -->
+    <div class="modal fade" id="modalAposta" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content modal-dark">
+                <div class="modal-header-dark">
+                    <h5 class="modal-title-dark"><i class="fas fa-ticket-alt"></i> Fazer Aposta</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body-dark" id="modalApostaBody">
+                    <!-- Será preenchido dinamicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script>
+        verificarAuth(true);
+
+        let modalAposta;
+        let corridaSelecionada = null;
+
+        function atualizarNavbar() {
+            const navLinks = document.getElementById('navLinks');
+            if (estaLogado()) {
+                navLinks.innerHTML = `
+                    <a href="corridas.html"><i class="fas fa-flag-checkered"></i> Corridas</a>
+                    <a href="minhas-apostas.html"><i class="fas fa-ticket-alt"></i> Minhas Apostas</a>
+                    <a href="perfil.html"><i class="fas fa-user-circle"></i> Perfil</a>
+                    <a href="#" onclick="logout(); return false;"><i class="fas fa-sign-out-alt"></i> Sair</a>
+                `;
+            } else {
+                navLinks.innerHTML = `
+                    <a href="index.html">Início</a>
+                    <a href="login.html">Entrar</a>
+                    <a href="cadastro.html" class="btn-gold"><i class="fas fa-bolt"></i> Cadastrar</a>
+                `;
+            }
+        }
+
+        async function carregarSaldo() {
+            if (!estaLogado()) return;
+            
+            try {
+                const saldo = await api.getSaldo();
+                document.getElementById('saldoContainer').innerHTML = `
+                    <div class="saldo-label">SEU SALDO</div>
+                    <div class="saldo-valor-display">${formatarMoeda(saldo)}</div>
+                    <div class="saldo-acoes">
+                        <a href="perfil.html" class="btn btn-gold">
+                            <i class="fas fa-wallet"></i> Depositar/Sacar
+                        </a>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Erro ao carregar saldo:', error);
+            }
+        }
+
+        async function carregarCorridas() {
+            const container = document.getElementById('listaCorridas');
+            container.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div></div>';
+
+            try {
+                let corridas = await api.getCorridas();
+                
+                // Aplicar filtros
+                const status = document.getElementById('filtroStatus').value;
+                const categoria = document.getElementById('filtroCategoria').value;
+                
+                if (status) corridas = corridas.filter(c => c.status === status);
+                if (categoria) corridas = corridas.filter(c => c.categoria === categoria);
+
+                if (corridas.length === 0) {
+                    container.innerHTML = '<div class="alert alert-info">Nenhuma corrida encontrada com os filtros selecionados.</div>';
+                    return;
+                }
+
+                container.innerHTML = corridas.map(corrida => {
+                    const pilotosHTML = corrida.pilotos?.slice(0, 6).map(piloto => `
+                        <div class="piloto-item-bet" onclick="abrirModalAposta(${corrida.id}, ${piloto.id})">
+                            <div class="piloto-info-bet">
+                                <div class="piloto-numero-bet">${piloto.numero}</div>
+                                <span class="piloto-nome-bet">${piloto.nome}</span>
+                            </div>
+                            <div class="piloto-odd-bet">${piloto.pivot.cotacao}x</div>
+                        </div>
+                    `).join('') || '<p class="text-muted">Nenhum piloto cadastrado</p>';
+
+                    return `
+                        <div class="corrida-card-bet">
+                            <div class="corrida-card-header-bet">
+                                <h3 class="corrida-titulo-bet">
+                                    <i class="fas fa-flag-checkered"></i>
+                                    ${corrida.nome}
+                                </h3>
+                                <span class="badge-status-bet ${corrida.status === 'aberta' ? 'badge-aberta' : 'badge-ao-vivo'}">
+                                    ${corrida.status === 'aberta' ? '🏁 ABERTA' : '🔴 AO VIVO'}
+                                </span>
+                            </div>
+                            <div class="corrida-info-bet">
+                                <div class="info-item-bet">
+                                    <span class="info-label-bet">Local</span>
+                                    <span class="info-value-bet"><i class="fas fa-map-marker-alt"></i> ${corrida.local}</span>
+                                </div>
+                                <div class="info-item-bet">
+                                    <span class="info-label-bet">Data e Hora</span>
+                                    <span class="info-value-bet"><i class="far fa-calendar"></i> ${formatarData(corrida.data_hora)}</span>
+                                </div>
+                                <div class="info-item-bet">
+                                    <span class="info-label-bet">Categoria</span>
+                                    <span class="info-value-bet"><i class="fas fa-layer-group"></i> ${corrida.categoria}</span>
+                                </div>
+                                <div class="info-item-bet">
+                                    <span class="info-label-bet">Pilotos</span>
+                                    <span class="info-value-bet"><i class="fas fa-motorcycle"></i> ${corrida.pilotos?.length || 0} inscritos</span>
+                                </div>
+                            </div>
+                            <div class="corrida-pilotos-bet">
+                                ${pilotosHTML}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                container.innerHTML = '<div class="alert alert-danger">Erro ao carregar corridas.</div>';
+                console.error(error);
+            }
+        }
+
+        async function abrirModalAposta(corridaId, pilotoIdPreSelecionado = null) {
+            if (!estaLogado()) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                const corrida = await api.getCorrida(corridaId);
+                corridaSelecionada = corrida;
+
+                const modalBody = document.getElementById('modalApostaBody');
+                modalBody.innerHTML = `
+                    <h6 class="mb-3" style="color: #d4af37; font-weight: 700;">${corrida.nome} - ${corrida.local}</h6>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Tipo de Aposta</label>
+                        <select class="form-select" id="tipoAposta">
+                            <option value="vencedor">🏆 Vencedor da Corrida</option>
+                            <option value="podio">🥇 Pódio (Top 3)</option>
+                            <option value="volta_rapida">⚡ Volta Mais Rápida</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Escolha o Piloto</label>
+                        <div id="listaPilotos" class="row g-2">
+                            ${corrida.pilotos.map(piloto => `
+                                <div class="col-md-6">
+                                    <div class="card piloto-card ${pilotoIdPreSelecionado === piloto.id ? 'selected' : ''}" 
+                                        onclick="selecionarPiloto(${piloto.id}, ${piloto.pivot.cotacao}, '${piloto.nome}', event)">
+                                        <div class="card-body p-3">
+                                            <div class="d-flex align-items-center justify-content-between">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="piloto-numero me-2">${piloto.numero}</div>
+                                                    <strong>${piloto.nome}</strong>
+                                                </div>
+                                                <span class="badge bg-warning badge-cotacao">${piloto.pivot.cotacao}x</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Valor da Aposta (R$)</label>
+                        <input type="number" class="form-control valor-aposta" id="valorAposta" 
+                            placeholder="Digite o valor" min="1" step="0.01" oninput="calcularRetorno()">
+                        <small class="text-muted">Valor mínimo: R$ 1,00</small>
+                    </div>
+
+                    <div class="retorno-box mb-3" id="retornoBox" style="display:none;">
+                        <small>Retorno Possível</small>
+                        <div class="retorno-valor" id="retornoPossivel">R$ 0,00</div>
+                    </div>
+
+                    <button class="btn btn-gold btn-lg w-100" id="btnConfirmarAposta" disabled onclick="confirmarAposta()">
+                        <i class="fas fa-check"></i> CONFIRMAR APOSTA
+                    </button>
+                `;
+
+                // Se piloto foi pré-selecionado, já selecionar
+                if (pilotoIdPreSelecionado) {
+                    const pilotoPreSel = corrida.pilotos.find(p => p.id === pilotoIdPreSelecionado);
+                    if (pilotoPreSel) {
+                        pilotoSelecionado = pilotoIdPreSelecionado;
+                        cotacaoSelecionada = pilotoPreSel.pivot.cotacao;
+                    }
+                }
+
+                modalAposta = new bootstrap.Modal(document.getElementById('modalAposta'));
+                modalAposta.show();
+            } catch (error) {
+                mostrarAlerta('Erro ao carregar detalhes da corrida', 'danger');
+            }
+        }
+
+        let pilotoSelecionado = null;
+        let cotacaoSelecionada = null;
+
+        function selecionarPiloto(pilotoId, cotacao, nome, event) {
+            // Prevenir propagação
+            if (event) {
+                event.stopPropagation();
+            }
+            
+            // Remover seleção anterior
+            document.querySelectorAll('.piloto-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Adicionar seleção no card clicado
+            if (event && event.currentTarget) {
+                event.currentTarget.classList.add('selected');
+            }
+            
+            // Salvar dados
+            pilotoSelecionado = pilotoId;
+            cotacaoSelecionada = cotacao;
+            
+            console.log('Piloto selecionado:', pilotoId, 'Cotação:', cotacao);
+            
+            // Recalcular
+            calcularRetorno();
+        }
+
+        function calcularRetorno() {
+            const valor = parseFloat(document.getElementById('valorAposta').value) || 0;
+            const btnConfirmar = document.getElementById('btnConfirmarAposta');
+            
+            if (pilotoSelecionado && valor > 0) {
+                const retorno = valor * cotacaoSelecionada;
+                document.getElementById('retornoPossivel').textContent = formatarMoeda(retorno);
+                document.getElementById('retornoBox').style.display = 'block';
+                btnConfirmar.disabled = false;
+            } else {
+                document.getElementById('retornoBox').style.display = 'none';
+                btnConfirmar.disabled = true;
+            }
+        }
+
+        async function confirmarAposta() {
+            const btn = document.getElementById('btnConfirmarAposta');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
+
+            const dados = {
+                corrida_id: corridaSelecionada.id,
+                piloto_id: pilotoSelecionado,
+                tipo_aposta: document.getElementById('tipoAposta').value,
+                valor: parseFloat(document.getElementById('valorAposta').value),
+                cotacao: cotacaoSelecionada
+            };
+
+            try {
+                const response = await api.criarAposta(dados);
+                
+                if (response.success) {
+                    modalAposta.hide();
+                    mostrarAlerta('Aposta realizada com sucesso! Boa sorte! 🏍️', 'success');
+                    carregarSaldo();
+                } else {
+                    mostrarAlerta(response.message || 'Erro ao realizar aposta', 'danger');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-check"></i> Confirmar Aposta';
+                }
+            } catch (error) {
+                mostrarAlerta('Erro ao realizar aposta. Verifique seu saldo.', 'danger');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-check"></i> Confirmar Aposta';
+            }
+        }
+
+        // Carregar dados ao iniciar
+        atualizarNavbar();
+        carregarSaldo();
+        carregarCorridas();
+
+        // Auto-refresh a cada 30 segundos
+        setInterval(carregarCorridas, 30000);
+    </script>
+</body>
+</html>
+

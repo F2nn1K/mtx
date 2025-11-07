@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Apostas Motocross</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-5">
+                    <div class="card auth-card shadow-lg">
+                        <div class="card-body p-5">
+                            <div class="text-center mb-4">
+                                <img src="img/logo.png" alt="Roraima Bets" style="max-width: 150px; margin-bottom: 20px;">
+                                <h2 style="color: #1a4d3a;">RORAIMA BETS</h2>
+                                <p class="text-muted">Entre na sua conta</p>
+                            </div>
+
+                            <div id="alertas"></div>
+
+                            <form id="formLogin">
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">E-mail</label>
+                                    <input type="email" class="form-control form-control-lg" id="email" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">Senha</label>
+                                    <input type="password" class="form-control form-control-lg" id="password" required>
+                                </div>
+
+                                <button type="submit" class="btn btn-success w-100 btn-lg" id="btnEntrar">
+                                    <i class="fas fa-sign-in-alt"></i> Entrar
+                                </button>
+                            </form>
+
+                            <div class="text-center mt-3">
+                                <p class="text-muted">Não tem uma conta? 
+                                    <a href="cadastro.html">Cadastre-se</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script>
+        verificarAuth(false);
+
+        document.getElementById('formLogin').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const btnEntrar = document.getElementById('btnEntrar');
+            btnEntrar.disabled = true;
+            btnEntrar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Entrando...';
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await api.login(email, password);
+                
+                if (response.success) {
+                    mostrarAlerta('Login realizado com sucesso! Redirecionando...', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'corridas.html';
+                    }, 1000);
+                } else {
+                    mostrarAlerta(response.message || 'Email ou senha incorretos', 'danger');
+                    btnEntrar.disabled = false;
+                    btnEntrar.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
+                }
+            } catch (error) {
+                mostrarAlerta('Erro ao fazer login. Verifique suas credenciais.', 'danger');
+                btnEntrar.disabled = false;
+                btnEntrar.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
+            }
+        });
+    </script>
+</body>
+</html>
+

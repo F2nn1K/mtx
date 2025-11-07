@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Perfil - Apostas Motocross</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #0d2818;">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <img src="img/logo.png" alt="Roraima Bets" height="40" style="margin-right: 10px;">
+                <strong style="color: #d4af37;">RORAIMA BETS</strong>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto"></ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <h1><i class="fas fa-user-circle"></i> Meu Perfil</h1>
+        <p class="text-muted">Gerencie sua carteira e transações</p>
+
+        <div id="alertas"></div>
+
+        <!-- Saldo -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <h6 class="text-muted">Saldo Disponível</h6>
+                        <h2 class="text-success" id="saldoAtual">R$ 0,00</h2>
+                        <div class="d-grid gap-2 mt-3">
+                            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalDeposito">
+                                <i class="fas fa-arrow-down"></i> Depositar
+                            </button>
+                            <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalSaque">
+                                <i class="fas fa-arrow-up"></i> Sacar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5>Dados Pessoais</h5>
+                        <div id="dadosUsuario"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transações -->
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-exchange-alt"></i> Minhas Transações</h5>
+            </div>
+            <div class="card-body">
+                <div id="listaTransacoes">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Depósito -->
+    <div class="modal fade" id="modalDeposito" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-arrow-down"></i> Solicitar Depósito</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <strong>Como depositar:</strong><br>
+                        1. Informe o valor desejado<br>
+                        2. Faça um PIX para a chave: <code>pix@apostas.com</code><br>
+                        3. Cole o comprovante (opcional)<br>
+                        4. Aguarde aprovação (normalmente em minutos)
+                    </div>
+
+                    <form id="formDeposito">
+                        <div class="mb-3">
+                            <label class="form-label">Valor do Depósito</label>
+                            <input type="number" class="form-control" id="valorDeposito" 
+                                min="10" step="0.01" required placeholder="R$ 0,00">
+                            <small class="text-muted">Valor mínimo: R$ 10,00</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Comprovante (opcional)</label>
+                            <textarea class="form-control" id="comprovanteDeposito" rows="2" 
+                                placeholder="Cole o link ou código do comprovante"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100" id="btnDepositar">
+                            <i class="fas fa-check"></i> Solicitar Depósito
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Saque -->
+    <div class="modal fade" id="modalSaque" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-arrow-up"></i> Solicitar Saque</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <strong>Atenção:</strong> O valor será debitado do seu saldo imediatamente 
+                        e transferido via PIX após aprovação.
+                    </div>
+
+                    <form id="formSaque">
+                        <div class="mb-3">
+                            <label class="form-label">Valor do Saque</label>
+                            <input type="number" class="form-control" id="valorSaque" 
+                                min="10" step="0.01" required placeholder="R$ 0,00">
+                            <small class="text-muted">Saldo disponível: <span id="saldoDisponivel">R$ 0,00</span></small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Chave PIX</label>
+                            <input type="text" class="form-control" id="chavePix" required 
+                                placeholder="CPF, E-mail, Telefone ou Chave Aleatória">
+                        </div>
+
+                        <button type="submit" class="btn btn-warning w-100" id="btnSacar">
+                            <i class="fas fa-check"></i> Solicitar Saque
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script>
+        verificarAuth(true);
+
+        let modalDeposito, modalSaque;
+
+        async function carregarDados() {
+            try {
+                const user = obterUsuario();
+                const saldo = await api.getSaldo();
+
+                document.getElementById('saldoAtual').textContent = formatarMoeda(saldo);
+                document.getElementById('saldoDisponivel').textContent = formatarMoeda(saldo);
+
+                document.getElementById('dadosUsuario').innerHTML = `
+                    <p><strong>Nome:</strong> ${user.nome}</p>
+                    <p><strong>E-mail:</strong> ${user.email}</p>
+                    <p><strong>CPF:</strong> ${user.cpf}</p>
+                    <p><strong>Telefone:</strong> ${user.telefone}</p>
+                `;
+
+                carregarTransacoes();
+            } catch (error) {
+                mostrarAlerta('Erro ao carregar dados', 'danger');
+            }
+        }
+
+        async function carregarTransacoes() {
+            try {
+                const transacoes = await api.getTransacoes();
+                const container = document.getElementById('listaTransacoes');
+
+                if (transacoes.length === 0) {
+                    container.innerHTML = '<p class="text-muted text-center">Nenhuma transação encontrada</p>';
+                    return;
+                }
+
+                container.innerHTML = `
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Tipo</th>
+                                    <th>Valor</th>
+                                    <th>Data</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${transacoes.map(t => `
+                                    <tr>
+                                        <td>
+                                            <i class="fas fa-arrow-${t.tipo === 'deposito' ? 'down text-success' : 'up text-warning'}"></i>
+                                            ${t.tipo_label}
+                                        </td>
+                                        <td><strong>${formatarMoeda(t.valor)}</strong></td>
+                                        <td>${formatarData(t.created_at)}</td>
+                                        <td>
+                                            <span class="badge bg-${t.status_color}">${t.status_label}</span>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Erro ao carregar transações:', error);
+            }
+        }
+
+        document.getElementById('formDeposito').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const btn = document.getElementById('btnDepositar');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
+
+            const valor = parseFloat(document.getElementById('valorDeposito').value);
+            const comprovante = document.getElementById('comprovanteDeposito').value;
+
+            try {
+                const response = await api.depositar(valor, comprovante);
+                
+                if (response.success) {
+                    mostrarAlerta('Depósito solicitado com sucesso! Aguarde aprovação.', 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('modalDeposito')).hide();
+                    document.getElementById('formDeposito').reset();
+                    carregarTransacoes();
+                }
+            } catch (error) {
+                mostrarAlerta('Erro ao solicitar depósito', 'danger');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-check"></i> Solicitar Depósito';
+            }
+        });
+
+        document.getElementById('formSaque').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const btn = document.getElementById('btnSacar');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
+
+            const valor = parseFloat(document.getElementById('valorSaque').value);
+            const chavePix = document.getElementById('chavePix').value;
+
+            try {
+                const response = await api.sacar(valor, chavePix);
+                
+                if (response.success) {
+                    mostrarAlerta('Saque solicitado com sucesso!', 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('modalSaque')).hide();
+                    document.getElementById('formSaque').reset();
+                    carregarDados();
+                }
+            } catch (error) {
+                mostrarAlerta('Erro ao solicitar saque. Verifique seu saldo.', 'danger');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-check"></i> Solicitar Saque';
+            }
+        });
+
+        carregarDados();
+    </script>
+</body>
+</html>
+
