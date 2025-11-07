@@ -49,14 +49,13 @@ RUN if [ ! -f .env ]; then cp env.example .env; fi
 # Gerar chave da aplicação
 RUN php artisan key:generate
 
-# Otimizar para produção
-RUN php artisan config:cache
-RUN php artisan route:cache
-RUN php artisan view:cache
+# Copiar script de inicialização
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # Expor porta 80
 EXPOSE 80
 
-# Comando para iniciar Apache
-CMD ["apache2-foreground"]
+# Usar script de inicialização que roda migrations
+ENTRYPOINT ["docker-entrypoint.sh"]
 
