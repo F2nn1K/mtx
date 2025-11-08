@@ -106,6 +106,4 @@ php artisan serve
 
 Sistema desenvolvido para Roraima Bets - Apostas de Motocross
 
----
-
-**Desenvolvido com ❤️ para os amantes de motocross! 🏍️**
+LV Consultoria
