@@ -13,9 +13,14 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        error_log('===== DASHBOARD INDEX INICIADO =====');
+        error_log('User autenticado: ' . (auth()->check() ? auth()->user()->email : 'nenhum'));
         try {
+            error_log('Buscando total usuarios...');
             $totalUsuarios = User::where('is_admin', false)->count();
+            error_log('Total usuarios: ' . $totalUsuarios);
         } catch (\Exception $e) {
+            error_log('ERRO usuarios: ' . $e->getMessage());
             $totalUsuarios = 0;
         }
 
@@ -57,10 +62,43 @@ class DashboardController extends Controller
             $proximasCorridas = collect();
         }
         
-        return view('admin.dashboard', compact(
-            'totalUsuarios', 'totalCorridas', 'totalApostas', 'totalApostasHoje',
-            'valorTotalApostas', 'valorApostasHoje', 'depositosPendentes', 'saquesPendentes',
-            'corridasAoVivo', 'proximasCorridas'
-        ));
+        error_log('Preparando para renderizar view...');
+        
+        try {
+            $view = view('admin.dashboard', compact(
+                'totalUsuarios', 'totalCorridas', 'totalApostas', 'totalApostasHoje',
+                'valorTotalApostas', 'valorApostasHoje', 'depositosPendentes', 'saquesPendentes',
+                'corridasAoVivo', 'proximasCorridas'
+            ));
+            
+            error_log('View criada, tentando renderizar...');
+            return $view;
+            
+        } catch (\Throwable $e) {
+            error_log('===== ERRO AO RENDERIZAR VIEW =====');
+            error_log('Mensagem: ' . $e->getMessage());
+            error_log('Arquivo: ' . $e->getFile());
+            error_log('Linha: ' . $e->getLine());
+            error_log('Trace: ' . $e->getTraceAsString());
+            
+            // Fallback HTML puro
+            return response()->make('
+                <!DOCTYPE html>
+                <html>
+                <head><title>Dashboard</title></head>
+                <body style="font-family: Arial; padding: 50px;">
+                    <h1>Dashboard - Roraima Bets</h1>
+                    <p><strong>Total Usuários:</strong> ' . $totalUsuarios . '</p>
+                    <p><strong>Total Corridas:</strong> ' . $totalCorridas . '</p>
+                    <p><strong>Total Apostas:</strong> ' . $totalApostas . '</p>
+                    <hr>
+                    <p style="color: red;"><strong>ERRO:</strong> ' . $e->getMessage() . '</p>
+                    <p><small>Arquivo: ' . $e->getFile() . ':' . $e->getLine() . '</small></p>
+                    <hr>
+                    <p><a href="/login">Voltar ao Login</a></p>
+                </body>
+                </html>
+            ', 200);
+        }
     }
 }
