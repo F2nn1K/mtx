@@ -1,4 +1,5 @@
 # Usar imagem PHP 8.2 com Apache
+# Build: 2025-11-07
 FROM php:8.2-apache
 
 # Instalar dependências do sistema (incluindo PostgreSQL)
